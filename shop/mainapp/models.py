@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth import get_user_model
 from django.contrib.contenttypes.models import ContentType
+from django.contrib.contenttypes.fields import GenericForeignKey
 
 User = get_user_model()
 
@@ -16,6 +17,9 @@ class Category(models.Model):
 
 
 class Product(models.Model):
+
+    class Meta:
+        abstract = True
 
     category = models.ForeignKey(Category, verbose_name='Категория', on_delete=models.CASCADE)  # CASCADE - удалить все связи с объектом
     title = models.CharField(max_length=255, verbose_name='Наименование')
@@ -33,7 +37,9 @@ class CartProduct(models.Model):
 
     user = models.ForeignKey('Customer', verbose_name='Покупатель', on_delete=models.CASCADE)
     cart = models.ForeignKey('Cart', verbose_name='Корзина', on_delete=models.CASCADE, related_name='related_products')
-    product = models.ForeignKey(Product, verbose_name='Товар', on_delete=models.CASCADE)
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
+    object_id = models.PositiveIntegerField()
+    content_object = GenericForeignKey('content_type', 'object_id')
     qty = models.PositiveIntegerField(default=1)
     final_price = models.DecimalField(max_digits=9, decimal_places=2, verbose_name='Общая цена')
 
