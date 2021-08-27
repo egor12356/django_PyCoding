@@ -1,3 +1,8 @@
+from PIL import Image
+from io import BytesIO
+import sys
+
+from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.db import models
 from django.contrib.auth import get_user_model
 from django.contrib.contenttypes.models import ContentType
@@ -38,8 +43,17 @@ class Category(models.Model):
         return self.name
 
 
-class Product(models.Model):
+class MinResolutionErrorException(Exception):
+    pass
 
+class MaxResolutionErrorException(Exception):
+    pass
+
+
+class Product(models.Model):
+    MIN_RESOLUTION = (400, 400)
+    MAX_RESOLUTION = (800, 800)
+    MAX_IMAGE_SIZE = 3145728
     class Meta:
         abstract = True
 
@@ -50,6 +64,32 @@ class Product(models.Model):
     description = models.TextField(verbose_name='Описание', null=True)
     price = models.DecimalField(max_digits=9, decimal_places=2, verbose_name='Цена')  # max_digits - максмум цифр,
                                                                                 # decimal_places - число цифр после запятой
+
+    def save(self, *args, **kwargs):
+        image = self.image
+        img = Image.open(image)
+        # Проверяем разме фото
+        # min_height, min_width = self.Product
+        # max_height, max_width = self.Product
+        # if img.height < min_height or img.width < min_width:
+        #     raise MinResolutionErrorException('Разрешение изображения меньше минимального')
+        # if img.height > max_height or img.width > max_width:
+        #     raise MaxResolutionErrorException('Разрешение изображения больше максимального')
+
+
+        # Обрезаем большое фото
+        new_img = img.convert('RGB')
+        resized_new_img = new_img.resize((200, 200), Image.ANTIALIAS)
+        filestream = BytesIO()
+        resized_new_img.save(filestream, 'JPEG', quality=90)
+        filestream.seek(0)
+        name = '{}.{}'.format(*self.image.name.split('.'))
+        print(f'name={name}')
+        self.image = InMemoryUploadedFile(
+            filestream, 'ImageField', name, 'jpeg/image', sys.getsizeof(filestream), None
+        )
+
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.title
