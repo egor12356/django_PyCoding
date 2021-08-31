@@ -43,27 +43,29 @@
             </div>
         </nav>
 
-        <div class="row">
-              <div class="col-lg-3 mt-5">
-                <div class="list-group">
-                  <a href="#" class="list-group-item">category 1</a>
-                  <a href="#" class="list-group-item">category 2</a>
-                  <a href="#" class="list-group-item">category 3</a>
-                </div>
+
+
+        <!-- Page Content -->
+  <div class="container">
+
+    <div class="row">
+
+      <div class="col-lg-3 mt-5">
+        <div class="list-group">
+          {% for category in categories %}
+          <a href="{{ category.url }}" class="list-group-item">{{ category.name }} ({{ category.count }})</a>
+          {% endfor %}
+        </div>
+
       </div>
       <!-- /.col-lg-3 -->
+
+      <div class="col-lg-9">
 
 
         {% block content %}
         <!-- Header-->
-        <header class="bg-dark py-5">
-            <div class="container px-4 px-lg-5 my-5">
-                <div class="text-center text-white">
-                    <h1 class="display-4 fw-bolder">Shop in style</h1>
-                    <p class="lead fw-normal text-white-50 mb-0">With this shop hompeage template</p>
-                </div>
-            </div>
-        </header>
+
         <!-- Section-->
         <section class="py-5">
             <div class="container px-4 px-lg-5 mt-5">
@@ -269,6 +271,7 @@
         </section>
 
         {% endblock content %}
+      </div>
         <!-- Footer-->
         <footer class="py-5 bg-dark">
             <div class="container"><p class="m-0 text-center text-white">Copyright © Your Website 2021</p></div>

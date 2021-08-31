@@ -1,11 +1,12 @@
 from django.shortcuts import render
 from django.views.generic import DetailView
-from .models import Notebook, Smartphone
+from .models import Notebook, Smartphone, Category
 
 # Create your views here.
 
 def test_view(requests):
-    return render(requests, 'base.html')
+    categories = Category.objects.get_categories_for_left_slider()
+    return render(requests, 'base.html', {'categories': categories})
 
 
 
