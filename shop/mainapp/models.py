@@ -22,46 +22,46 @@ def get_product_url(obj, viewname):
 class LatestProductsManager:
 
     @staticmethod
-    def get_products_for_main_page(self, *args, **kwargs):
+    def get_products_for_main_page(*args, **kwargs):
         with_respect_to = kwargs.get('with_respect_to')
         products = []
         ct_models = ContentType.objects.filter(model__in=args)
         for ct_model in ct_models:
-            model_products = ct_model.model_class()._base_manager.all().orber_by('-id')[:5]
+            model_products = ct_model.model_class()._base_manager.all().order_by('-id')[:5]
             products.extend(model_products)
-
         if with_respect_to:
             ct_model = ContentType.objects.filter(model=with_respect_to)
             if ct_model.exists():
                 if with_respect_to in args:
                     return sorted(
-                        products, key=lambda  x: x.__class__._meta.model_name.startwith(with_respect_to), reverse=True
+                        products, key=lambda x: x.__class__._meta.model_name.startswith(with_respect_to), reverse=True
                     )
-
-
         return products
+
+class LatestProducts:
+
+    objects = LatestProductsManager()
 
 
 class CategoryManager(models.Manager):
 
     CATEGORY_NAME_COUNT_NAME = {
         'Ноутбуки': 'notebook__count',
-        'Смартфоны': 'smartphone__count',
+        'Смартфоны': 'smartphone__count'
     }
 
     def get_queryset(self):
         return super().get_queryset()
 
-    def get_categories_for_left_slider(self):
+    def get_categories_for_left_sidebar(self):
         models = get_models_for_count('notebook', 'smartphone')
         qs = list(self.get_queryset().annotate(*models))
-        print(f'qs={qs}')
-
         data = [
             dict(name=c.name, url=c.get_absolute_url(), count=getattr(c, self.CATEGORY_NAME_COUNT_NAME[c.name]))
             for c in qs
         ]
         return data
+
 
 
 class Category(models.Model):
