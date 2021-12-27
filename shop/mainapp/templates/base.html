@@ -106,13 +106,14 @@
                   <a href="{{ product.get_absolute_url }}">{{ product.title }}</a>
                 </h4>
                 <h5>{{ product.price }} руб.</h5>
-                <a>
-                <button class="btn btn-danger">Добавить в корзину</button>
+
+                  <button class="btn btn-danger">Добавить в корзину</button>
                 </a>
               </div>
             </div>
           </div>
           {% endfor %}
+
         </div>
         <!-- /.row -->
       {% endblock content %}
